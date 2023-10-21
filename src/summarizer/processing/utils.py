@@ -14,12 +14,14 @@ def log(message: str, log_type: str = "INFO", log_file: str = "logs.txt") -> Non
     # with open(log_file, "a") as f:
     #     f.write(f"{log_message}\n")
 
+
 def custom_cosine(v1, v2):
     cos = 0
     for i in range(len(v1)):
         cos = cos + v1[i] * v2[i]
 
     return cos
+
 
 def process_arguments() -> tuple[str, str, list[str]]:
     """Parses project call parameters"""

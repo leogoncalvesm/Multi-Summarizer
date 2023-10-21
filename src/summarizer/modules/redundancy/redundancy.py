@@ -35,7 +35,7 @@ class Redundancy(SelectionCriteria):
         correlations = self.__calculate_bow_correlations(bow_df)
         redundancies = self.__find_redundancies(correlations)
         cluster_redundancies = self.__cluster_redundancies(redundancies)
-        print("REDUND", cluster_redundancies)
+
         segment_clusters = [
             set(map(self.__segment_from_indexes, *zip(*cluster)))
             for cluster in cluster_redundancies
