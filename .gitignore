@@ -1,5 +1,6 @@
 # Frames and result videos directories
 video_sets/
+video_frames/
 results/
 
 # Byte-compiled / optimized / DLL files
