@@ -61,7 +61,11 @@ def process_arguments() -> tuple[str, str, list[str]]:
         raise Exception(f"Video dataset '{args.videos_path}' not found")
 
     # Using all videos in directory if none passed by parameter
-    videos_list = args.videos[0] if args.videos else listdir(args.videos_path)
+    videos_list = (
+        args.videos[0]
+        if args.videos
+        else [video for video in listdir(args.videos_path) if not video.startswith(".")]
+    )
 
     # Validating if there're at least two videos to summarize
     if len(videos_list) < 2:
