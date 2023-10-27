@@ -20,14 +20,24 @@ class Redundancy(SelectionCriteria):
         self.__summarizer = summarizer
 
     def include(self) -> HSMVideoSumm:
-        matches = self.__get_redundancy_clusters()
+        cluster_redundancies = self.__get_redundancy_clusters()
+
+        matches = [
+            set(map(self.__segment_from_indexes, *zip(*cluster)))
+            for cluster in cluster_redundancies
+        ]
+
         for cluster in matches:
             self.__summarizer.summary_video.append_segment(min(cluster))
 
         return self.__summarizer
 
     def exclude(self) -> HSMVideoSumm:
-        # TODO
+        cluster_redundancies = self.__get_redundancy_clusters()
+        for cluster in cluster_redundancies:
+            for video_index, segment_index in cluster:
+                self.__summarizer.videos[video_index].delete_segment(segment_index)
+
         return self.__summarizer
 
     def __get_redundancy_clusters(self):
@@ -36,11 +46,7 @@ class Redundancy(SelectionCriteria):
         redundancies = self.__find_redundancies(correlations)
         cluster_redundancies = self.__cluster_redundancies(redundancies)
 
-        segment_clusters = [
-            set(map(self.__segment_from_indexes, *zip(*cluster)))
-            for cluster in cluster_redundancies
-        ]
-        return segment_clusters
+        return cluster_redundancies
 
     def __segment_from_indexes(self, video_index: int, segment_index: int) -> Segment:
         return self.__summarizer.videos[video_index].get_segment(segment_index)
