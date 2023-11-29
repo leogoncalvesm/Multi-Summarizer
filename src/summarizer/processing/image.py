@@ -70,14 +70,14 @@ class Keyframe:
         num_match = 0
         d1_t, d2_t = map(transpose, (self.descriptor, other.descriptor))
 
-        for desc, i in enumerate(self.descriptor):
+        for i, desc in enumerate(self.descriptor):
             sim = dot(desc, d2_t)
             self_match = argsort(-sim)[0]
 
             if sim[self_match] >= threshold:
                 match_feature = other.descriptor[self_match]
                 sim_check = dot(match_feature, d1_t)
-                other_match = argsort(-sim_check)
+                other_match = argsort(-sim_check)[0]
 
                 num_match += (sim_check[other_match] >= threshold) and (
                     other_match == i
@@ -99,6 +99,8 @@ class Keyframe:
                 abs(self.descriptor_size - kf.descriptor_size)
                 >= kf.descriptor_size * min_keypoints_diff_ratio
             )
-            or (self.num_matches(kf) < min_descriptors_diff_ratio * kf.descriptor_size)
+            or (
+                self.num_matches(kf) < (min_descriptors_diff_ratio * kf.descriptor_size)
+            )
             for kf in keyframes
         ) == len(keyframes)
