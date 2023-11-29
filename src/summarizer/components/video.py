@@ -21,7 +21,7 @@ class Video:
     def append_segment(self, new_segment: Segment) -> None:
         self.__segments.append(new_segment)
 
-    def write_from_segments(self, fadein: float = 0.5, fadeout: float = 0.5) -> None:
+    def save(self, fadein: float = 0.5, fadeout: float = 0.5) -> None:
         clips_list = []
         for segment in self.__segments:
             clip = VideoFileClip(segment.get_video().get_video_path()).subclip(

@@ -2,37 +2,37 @@ from __future__ import annotations
 
 from summarizer.components.video import Video
 from summarizer.components.segment import Segment
-from summarizer.modules.module import SelectionCriteria
+from summarizer.modules.modules_base import SelectionCriteria
 from summarizer.processing.image import ImageProcessing
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from summarizer.components.summarizer import HSMVideoSumm
+    from summarizer.components.summarizer import BaseSummarizer
 
 
 class Introduction(SelectionCriteria):
-    def __init__(self, summarizer: HSMVideoSumm) -> None:
+    def __init__(self, summarizer: BaseSummarizer) -> None:
         self.__summarizer = summarizer
 
-    def include(self) -> HSMVideoSumm:
+    def include(self) -> BaseSummarizer:
         shortest_intro = self.__get_shortest_introduction()
         if shortest_intro:
-            self.__summarizer.summary_video.append_segment(shortest_intro)
+            self.__summarizer.append_segment_to_summary(shortest_intro)
         return self.__summarizer
 
-    def exclude(self) -> HSMVideoSumm:
+    def exclude(self) -> BaseSummarizer:
         self.__remove_introductions()
         return self.__summarizer
 
     def __remove_introductions(self) -> None:
-        for video in self.__summarizer.videos:
+        for video in self.__summarizer.get_videos():
             intro = self.__find_introduction(video)
             self.__delete_introduction(video, intro)
 
     def __get_shortest_introduction(self) -> Segment:
         min_intro = None
-        for video in self.__summarizer.videos:
+        for video in self.__summarizer.get_videos():
             # Detecting introduction in video and keeping the smallest one
             video_intro = self.__find_introduction(video)
 
@@ -51,7 +51,7 @@ class Introduction(SelectionCriteria):
         Introduction's end is detected by calculating the histogram intersection betweeen consecutive frames.
         """
         # Flattened list of frames in video
-        all_frames = video.load_frames(self.__summarizer.frames_path, sort=True)
+        all_frames = video.load_frames(self.__summarizer.get_frames_path(), sort=True)
 
         # Creating an empty segment
         intro_segment = Segment(0, 0)

@@ -2,24 +2,23 @@ from __future__ import annotations
 
 from pandas import DataFrame
 from numpy import equal, tril
-from functools import partial
 
 from summarizer.processing.text import BagOfWords
 from summarizer.components.segment import Segment
-from summarizer.modules.module import SelectionCriteria
+from summarizer.modules.modules_base import SelectionCriteria
 from summarizer.processing.utils import custom_cosine
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from summarizer.components.summarizer import HSMVideoSumm
+    from summarizer.components.summarizer import BaseSummarizer
 
 
 class Redundancy(SelectionCriteria):
-    def __init__(self, summarizer: HSMVideoSumm) -> None:
+    def __init__(self, summarizer: BaseSummarizer) -> None:
         self.__summarizer = summarizer
 
-    def include(self) -> HSMVideoSumm:
+    def include(self) -> BaseSummarizer:
         cluster_redundancies = self.__get_redundancy_clusters()
 
         matches = [
@@ -28,15 +27,17 @@ class Redundancy(SelectionCriteria):
         ]
 
         for cluster in matches:
-            self.__summarizer.summary_video.append_segment(min(cluster))
+            self.__summarizer.append_segment_to_summary(min(cluster))
 
         return self.__summarizer
 
-    def exclude(self) -> HSMVideoSumm:
+    def exclude(self) -> BaseSummarizer:
         cluster_redundancies = self.__get_redundancy_clusters()
         for cluster in cluster_redundancies:
             for video_index, segment_index in cluster:
-                self.__summarizer.videos[video_index].delete_segment(segment_index)
+                self.__summarizer.get_video_at(video_index).delete_segment(
+                    segment_index
+                )
 
         return self.__summarizer
 
@@ -49,13 +50,13 @@ class Redundancy(SelectionCriteria):
         return cluster_redundancies
 
     def __segment_from_indexes(self, video_index: int, segment_index: int) -> Segment:
-        return self.__summarizer.videos[video_index].get_segment(segment_index)
+        return self.__summarizer.get_video_at(video_index).get_segment(segment_index)
 
     def __generate_bow_df(self) -> DataFrame:
         bow = BagOfWords(
             {
                 (vid_index, seg_index): segment.get_content()
-                for vid_index, video in enumerate(self.__summarizer.videos)
+                for vid_index, video in enumerate(self.__summarizer.get_videos())
                 for seg_index, segment in enumerate(video.get_segments())
             }
         )
@@ -134,7 +135,8 @@ class Redundancy(SelectionCriteria):
 
     def __calc_minimum_threshold(self):
         set_time = sum(
-            video.get_segments()[-1].get_end() for video in self.__summarizer.videos
+            video.get_segments()[-1].get_end()
+            for video in self.__summarizer.get_videos()
         )
         dif = (set_time - 785) / 785
         return 0.17 + 0.17 * dif

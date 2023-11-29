@@ -1,39 +1,76 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from summarizer.components.video import Video
-from summarizer.modules.introduction.introduction import Introduction
-from summarizer.modules.subjectivity.subjectivity import Subjectivity
-from summarizer.modules.redundancy.redundancy import Redundancy
+from summarizer.components.segment import Segment
+
+from summarizer.modules.quality import Quality
+from summarizer.modules.redundancy import Redundancy
+from summarizer.modules.introduction import Introduction
+from summarizer.modules.subjectivity import Subjectivity
 
 
-class BaseSummarizer(ABC):
-    pass
-
-
-class HSMVideoSumm(BaseSummarizer):
+class BaseSummarizer:
     def __init__(
-        self, summary_name: str, frames_path: str, output_path: str, videos: list[Video]
+        self,
+        videos: list[Video] = [],
+        summary_name: str = "",
+        frames_path: str = "",
+        output_path: str = "output.mp4",
     ) -> None:
-        self.videos = videos
-        self.frames_path = frames_path
-        self.summary_video = Video(name=summary_name, path=output_path)
+        self.__videos = videos
+        self.__frames_path = frames_path
+        self.__summary_video = Video(name=summary_name, path=output_path)
 
-    def save_summary(self):
-        self.summary_video.write_from_segments()
+    @abstractmethod
+    def summarize(self) -> Video:
+        pass
 
-    def introduction(self, include: bool = True) -> HSMVideoSumm:
+    def get_frames_path(self) -> str:
+        return self.__frames_path
+
+    def get_videos(self) -> list[Video]:
+        return self.__videos
+
+    def get_video_at(self, index: int) -> None:
+        return self.__videos[index]
+
+    def append_segment_to_summary(self, segment: Segment) -> None:
+        self.__summary_video.append_segment(segment)
+
+    def get_summary_video(self) -> Video:
+        return self.__summary_video
+
+    def introduction(self, include: bool = True) -> BaseSummarizer:
         if include:
             return Introduction(self).include()
         return Introduction(self).exclude()
 
-    def subjectivity(self, include: bool = True) -> HSMVideoSumm:
+    def subjectivity(self, include: bool = True) -> BaseSummarizer:
         if include:
             return Subjectivity(self).include()
         return Subjectivity(self).exclude()
 
-    def redundancy(self, include: bool = True) -> HSMVideoSumm:
+    def redundancy(self, include: bool = True) -> BaseSummarizer:
         if include:
             return Redundancy(self).include()
         return Redundancy(self).exclude()
+
+    def quality(self, include: bool = True) -> BaseSummarizer:
+        if include:
+            return Quality(self).include()
+        return Quality(self).exclude()
+
+
+class HSMVideoSumm(BaseSummarizer):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def summarize(self) -> Video:
+        return (
+            self.introduction(include=True)
+            .subjectivity(include=False)
+            .redundancy(include=True)
+            .get_summary_video()
+        )

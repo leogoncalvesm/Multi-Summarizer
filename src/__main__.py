@@ -22,17 +22,17 @@ def main(**kwargs):
     # Loading videos
     videos = dataset_loader.load_videos()
 
-    # Creating summarizer object
-    video_summ = HSMVideoSumm(
+    # Creating HSMVideoSumm summarizer object
+    summarizer = HSMVideoSumm(
+        videos=videos,
         summary_name=dataset.name,
         frames_path=frames_dir,
         output_path=output,
-        videos=videos,
     )
 
-    # Running summarization steps
-    video_summ = video_summ.introduction().subjectivity(include=False).redundancy()
-    video_summ.save_summary()
+    # Running summarization
+    video_summary = summarizer.summarize()
+    video_summary.save()
 
 
 if __name__ == "__main__":
