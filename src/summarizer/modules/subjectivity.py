@@ -3,13 +3,14 @@ from __future__ import annotations
 from summarizer.components.video import Video
 from summarizer.components.segment import Segment
 from summarizer.processing.image import FaceDetector
-from summarizer.modules.modules_base import SelectionCriteria
 from summarizer.processing.text import SubjectivityGoogleAPI
 from summarizer.processing.models import (
     FACE_CLASSIFIER,
     SENTIMENT_API_RESULTS,
     SENTILEX_DATA_PT,
 )
+
+from summarizer.modules.modules_base import SelectionCriteria
 
 from typing import TYPE_CHECKING
 

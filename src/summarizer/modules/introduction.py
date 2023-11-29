@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from summarizer.components.video import Video
 from summarizer.components.segment import Segment
-from summarizer.modules.modules_base import SelectionCriteria
 from summarizer.processing.image import ImageProcessing
+
+from summarizer.modules.modules_base import SelectionCriteria
 
 from typing import TYPE_CHECKING
 

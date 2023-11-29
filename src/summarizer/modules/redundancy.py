@@ -3,10 +3,11 @@ from __future__ import annotations
 from pandas import DataFrame
 from numpy import equal, tril
 
-from summarizer.processing.text import BagOfWords
 from summarizer.components.segment import Segment
-from summarizer.modules.modules_base import SelectionCriteria
+from summarizer.processing.text import BagOfWords
 from summarizer.processing.utils import custom_cosine
+
+from summarizer.modules.modules_base import SelectionCriteria
 
 from typing import TYPE_CHECKING
 

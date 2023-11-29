@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from summarizer.components.segment import Segment
+
 from summarizer.modules.modules_base import SelectionCriteria
 
 from typing import TYPE_CHECKING
@@ -19,3 +21,7 @@ class Quality(SelectionCriteria):
     def exclude(self) -> BaseSummarizer:
         # TODO
         return self.__summarizer
+
+    @staticmethod
+    def get_segment_quality(segment: Segment) -> float:
+        return
