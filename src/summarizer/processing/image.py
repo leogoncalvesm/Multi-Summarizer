@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from numpy import ndarray, dot, argsort, transpose
+from numpy import ndarray, dot, argsort, transpose, concatenate
 from cv2 import (
     NORM_L1,
     calcHist,
@@ -55,7 +55,7 @@ class ImageProcessing:
             if keyframe.is_keyframe(segment_keyframes):
                 segment_keyframes.append(keyframe)
 
-        return
+        return concatenate([kf.descriptor for kf in segment_keyframes])
 
 
 @dataclass
