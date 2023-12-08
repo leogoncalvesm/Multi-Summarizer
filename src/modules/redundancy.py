@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from pandas import DataFrame
 from numpy import equal, tril
+from itertools import chain
 
 from components.video import Video
 from components.segment import Segment
 from processing.text import BagOfWords
 from processing.utils import custom_cosine
 from modules.quality import Quality
+from modules.chronology import Chronology
 from modules.modules_base import SelectionCriteria
 from summarizers.base_summarizer import BaseSummarizer
 
@@ -19,23 +21,45 @@ class Redundancy(SelectionCriteria):
     def include(self) -> BaseSummarizer:
         cluster_redundancies = self.__get_redundancy_clusters()
 
-        matches = [
-            list(map(self.__segment_from_indexes, *zip(*cluster)))
-            for cluster in cluster_redundancies
-        ]
+        # Mapping each clustered segment for the videos to summarize as {segment: (video index, segment index)}
+        segment_index = {
+            self.__segment_from_indexes(item[0], item[1]): item
+            for item in set(chain(*cluster_redundancies))
+        }
 
         # Applying Quality selection criteria to retrieve the 1 segment with best quality for each cluster
-        self.__summarizer.append_segments_to_summary(
-            Quality(
-                summarizer=BaseSummarizer(
-                    videos=[
-                        Video(segments=cluster, assign_to_segments=False)
-                        for cluster in matches
-                    ],
-                    frames_path=self.__summarizer.get_frames_path(),
-                )
-            ).best_segments_for_videos(n_segments=1, flatten=True)
+        quality = Quality(
+            summarizer=BaseSummarizer(
+                videos=[
+                    Video(
+                        segments=list(map(self.__segment_from_indexes, *zip(*cluster))),
+                        assign_to_segments=False,
+                    )
+                    for cluster in cluster_redundancies
+                ],
+                frames_path=self.__summarizer.get_frames_path(),
+            )
         )
+
+        # Retrieving best segments as their corresponding (video index, segment index) tuple
+        best_segments = [
+            segment_index.get(best)
+            for best in quality.best_segments_for_videos(n_segments=1, flatten=True)
+        ]
+
+        # Ordering by chronology strategy and mapping (video index, segment index) tuple back to segment object
+        segments_to_include = [
+            self.__segment_from_indexes(seg_item[0], seg_item[1])
+            for seg_item in Chronology.order_by_similarity_cluster(
+                items_cluster={
+                    item: cluster
+                    for item, cluster in zip(best_segments, cluster_redundancies)
+                }
+            )
+        ]
+
+        # Including segments in video summary
+        self.__summarizer.append_segments_to_summary(segments_to_include)
 
         return self.__summarizer
 
@@ -49,7 +73,7 @@ class Redundancy(SelectionCriteria):
 
         return self.__summarizer
 
-    def __get_redundancy_clusters(self):
+    def __get_redundancy_clusters(self) -> list[set[tuple[int, int]]]:
         bow_df = self.__generate_bow_df()
         correlations = self.__calculate_bow_correlations(bow_df)
         redundancies = self.__find_redundancies(correlations)
