@@ -25,9 +25,12 @@ class Chronology(SelectionCriteria):
         items_cluster: dict[tuple[int, int], set[tuple[int, int]]]
     ) -> list[int, int]:
         result = []
+
         for item, cluster in items_cluster.items():
             ind = Chronology.find_insert_position(item, cluster, result)
             result.insert(ind, item)
+
+        return result
 
     @staticmethod
     def find_same_video_in_cluster(video_index, cluster):
