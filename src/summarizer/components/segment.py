@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import timedelta
+
 from summarizer.components.frame import Frame
 
 from typing import TYPE_CHECKING
@@ -33,6 +35,9 @@ class Segment:
     def get_end(self) -> int:
         return self.__end
 
+    def set_begin(self, begin: int) -> None:
+        self.__begin = begin
+
     def set_end(self, end: int) -> None:
         self.__end = end
 
@@ -49,3 +54,10 @@ class Segment:
         frames = self.__video.load_frames(frames_path, sort=sort)
         segment_range = range(self.__begin, self.__end)
         return list(filter(lambda f: f.get_video_second() in segment_range, frames))
+
+    def __str__(self) -> str:
+        return "[{begin} - {end}] {content}".format(
+            begin=timedelta(seconds=self.get_begin()),
+            end=timedelta(seconds=self.get_end()),
+            content=timedelta(seconds=self.get_content()),
+        )

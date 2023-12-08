@@ -3,16 +3,13 @@ from __future__ import annotations
 from pandas import DataFrame
 from numpy import equal, tril
 
+from summarizer.components.video import Video
 from summarizer.components.segment import Segment
+from summarizer.summarizers.base_summarizer import BaseSummarizer
+from summarizer.modules.quality import Quality
+from summarizer.modules.modules_base import SelectionCriteria
 from summarizer.processing.text import BagOfWords
 from summarizer.processing.utils import custom_cosine
-
-from summarizer.modules.modules_base import SelectionCriteria
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from summarizer.components.summarizer import BaseSummarizer
 
 
 class Redundancy(SelectionCriteria):
@@ -23,12 +20,22 @@ class Redundancy(SelectionCriteria):
         cluster_redundancies = self.__get_redundancy_clusters()
 
         matches = [
-            set(map(self.__segment_from_indexes, *zip(*cluster)))
+            list(map(self.__segment_from_indexes, *zip(*cluster)))
             for cluster in cluster_redundancies
         ]
 
-        for cluster in matches:
-            self.__summarizer.append_segment_to_summary(min(cluster))
+        # Applying Quality selection criteria to retrieve the 1 segment with best quality for each cluster
+        self.__summarizer.append_segments_to_summary(
+            Quality(
+                summarizer=BaseSummarizer(
+                    videos=[
+                        Video(segments=cluster, assign_to_segments=False)
+                        for cluster in matches
+                    ],
+                    frames_path=self.__summarizer.get_frames_path(),
+                )
+            ).best_segments_for_videos(n_segments=1)
+        )
 
         return self.__summarizer
 

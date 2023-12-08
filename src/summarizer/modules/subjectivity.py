@@ -15,7 +15,7 @@ from summarizer.modules.modules_base import SelectionCriteria
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from summarizer.components.summarizer import BaseSummarizer
+    from summarizer.summarizers.base_summarizer import BaseSummarizer
 
 
 class Subjectivity(SelectionCriteria):

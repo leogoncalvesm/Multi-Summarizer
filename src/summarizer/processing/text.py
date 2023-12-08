@@ -123,7 +123,6 @@ class BagOfWords:
         )
 
         self.__bow_df = index_df.join(tfidf_df).set_index(index_names)
-        print(self.__bow_df)
         return self
 
 

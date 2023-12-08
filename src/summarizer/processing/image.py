@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+from math import log10
+from typing import Any
+from pandas import DataFrame
+from collections import Counter
+from sklearn.cluster import KMeans
 from dataclasses import dataclass, field
-from numpy import ndarray, dot, argsort, transpose, concatenate
+from numpy import ndarray, dot, zeros, argsort, transpose, concatenate
 from cv2 import (
     NORM_L1,
     calcHist,
@@ -25,6 +30,37 @@ class FaceDetector:
         return bool(len(faces))
 
 
+class BagOfVisualWords:
+    def __init__(self, items: dict[Any, ndarray], dict_size: int) -> None:
+        self.__items = items
+        self.__dict_size = dict_size
+        self.__kmeans = None
+        self.__bovw_df = None
+
+    def fit_kmeans(self, **kwargs) -> None:
+        self.__kmeans = KMeans(n_clusters=self.__dict_size, **kwargs)
+        self.__kmeans.fit(concatenate(list(self.__items.values())))
+
+    def generate_bovw_dataframe(self) -> DataFrame:
+        self.__bovw_df = DataFrame(
+            self.__items.items(), columns=["segment", "features"]
+        )
+
+        tfs = self.__bovw_df.features.apply(self.__kmeans.predict).apply(Counter)
+        doc_freq = Counter(key for a in tfs for key in a.keys())
+
+        for key in doc_freq.keys():
+            term_freq = tfs.apply(lambda x: x.get(key))
+            term_idf = log10(self.__dict_size / doc_freq.get(key))
+
+            self.__bovw_df[key] = term_freq * term_idf
+
+        self.__bovw_df.drop(columns=["features"], inplace=True)
+        self.__bovw_df.set_index("segment", drop=True, inplace=True)
+
+        return self.__bovw_df
+
+
 class ImageProcessing:
     @staticmethod
     def compare_histogram_intersection(frame_1: Frame, frame_2: Frame) -> float:
@@ -42,7 +78,6 @@ class ImageProcessing:
     @staticmethod
     def ks_sift(segment: Segment, frames_path: str):
         segment_keyframes = []
-
         for frame in segment.load_frames(frames_path)[1:-1]:
             _, descriptor = xfeatures2d.SIFT_create().detectAndCompute(
                 frame.load_image(), None
@@ -54,7 +89,6 @@ class ImageProcessing:
             keyframe = Keyframe(descriptor=descriptor)
             if keyframe.is_keyframe(segment_keyframes):
                 segment_keyframes.append(keyframe)
-
         return concatenate([kf.descriptor for kf in segment_keyframes])
 
 

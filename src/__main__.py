@@ -1,6 +1,6 @@
-from summarizer.components.summarizer import HSMVideoSumm
 from summarizer.processing.utils import log, process_arguments
 from summarizer.processing.dataset import Dataset, DatasetLoader
+from summarizer.summarizers.hsmvideosumm import HSMVideoSumm
 
 
 def main(**kwargs):
@@ -32,6 +32,8 @@ def main(**kwargs):
 
     # Running summarization
     video_summary = summarizer.summarize()
+    summarizer.print_summary()
+
     video_summary.save()
 
 

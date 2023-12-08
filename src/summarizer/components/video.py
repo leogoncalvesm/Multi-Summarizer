@@ -7,12 +7,19 @@ from summarizer.components.segment import Segment
 
 
 class Video:
-    def __init__(self, name: str, path: str, segments: list[Segment] = []) -> None:
+    def __init__(
+        self,
+        name: str = "",
+        path: str = "",
+        segments: list[Segment] = [],
+        assign_to_segments: bool = True,
+    ) -> None:
         self.__name = name
         self.__path = path
         self.__segments = segments
 
-        self.__assign_to_segments()
+        if assign_to_segments:
+            self.__assign_to_segments()
 
     def __assign_to_segments(self) -> None:
         for segment in self.__segments:
