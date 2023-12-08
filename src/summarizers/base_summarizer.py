@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from summarizer.components.video import Video
-from summarizer.components.segment import Segment
+from components.video import Video
+from components.segment import Segment
 
 
 class BaseSummarizer:
@@ -15,8 +15,10 @@ class BaseSummarizer:
         output_path: str = "output.mp4",
     ) -> None:
         self.__videos = videos
+        self.__summary_name = summary_name
         self.__frames_path = frames_path
-        self.__summary_video = Video(name=summary_name, path=output_path)
+        self.__output_path = output_path
+        self.__summary_video = None
 
     @abstractmethod
     def summarize(self) -> Video:
@@ -31,12 +33,16 @@ class BaseSummarizer:
     def get_video_at(self, index: int) -> None:
         return self.__videos[index]
 
+    def start_summary_video(self) -> BaseSummarizer:
+        self.__summary_video = Video(name=self.__summary_name, path=self.__output_path)
+        return self
+
     def append_segment_to_summary(self, segment: Segment) -> None:
         self.__summary_video.append_segment(segment)
 
     def append_segments_to_summary(self, segments: list[Segment]) -> None:
         for segment in segments:
-            self.__summary_video.append_segment(segment)
+            self.append_segment_to_summary(segment)
 
     def adjust_summary_segments_seconds(self) -> None:
         new_begin = 0

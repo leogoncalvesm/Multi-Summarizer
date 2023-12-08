@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from summarizer.components.frame import Frame
+from components.frame import Frame
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from summarizer.components.video import Video
+    from components.video import Video
 
 
 class Segment:
@@ -59,5 +59,5 @@ class Segment:
         return "[{begin} - {end}] {content}".format(
             begin=timedelta(seconds=self.get_begin()),
             end=timedelta(seconds=self.get_end()),
-            content=timedelta(seconds=self.get_content()),
+            content=self.get_content(),
         )

@@ -1,6 +1,6 @@
 from os.path import join, dirname
 
-MODELS_DIR = join(dirname(dirname(dirname(__file__))), "models")
+MODELS_DIR = join(dirname(dirname(__file__)), "models")
 
 IMAGE_MODELS_DIR = join(MODELS_DIR, "image")
 TEXT_MODELS_DIR = join(MODELS_DIR, "text")

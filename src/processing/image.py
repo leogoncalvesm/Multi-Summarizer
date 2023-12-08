@@ -17,8 +17,8 @@ from cv2 import (
     HISTCMP_INTERSECT,
 )
 
-from summarizer.components.frame import Frame
-from summarizer.components.segment import Segment
+from components.frame import Frame
+from components.segment import Segment
 
 
 class FaceDetector:

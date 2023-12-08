@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from itertools import chain
 
-from summarizer.components.segment import Segment
-from summarizer.modules.modules_base import SelectionCriteria
-from summarizer.processing.image import BagOfVisualWords, ImageProcessing
+from components.segment import Segment
+from modules.modules_base import SelectionCriteria
+from processing.image import BagOfVisualWords, ImageProcessing
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from summarizer.summarizers.base_summarizer import BaseSummarizer
+    from summarizers.base_summarizer import BaseSummarizer
 
 
 class Quality(SelectionCriteria):

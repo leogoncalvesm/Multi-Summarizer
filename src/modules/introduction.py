@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from summarizer.components.video import Video
-from summarizer.components.segment import Segment
-from summarizer.processing.image import ImageProcessing
+from components.video import Video
+from components.segment import Segment
+from processing.image import ImageProcessing
 
-from summarizer.modules.modules_base import SelectionCriteria
+from modules.modules_base import SelectionCriteria
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from summarizer.summarizers.base_summarizer import BaseSummarizer
+    from summarizers.base_summarizer import BaseSummarizer
 
 
 class Introduction(SelectionCriteria):

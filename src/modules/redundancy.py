@@ -3,13 +3,13 @@ from __future__ import annotations
 from pandas import DataFrame
 from numpy import equal, tril
 
-from summarizer.components.video import Video
-from summarizer.components.segment import Segment
-from summarizer.summarizers.base_summarizer import BaseSummarizer
-from summarizer.modules.quality import Quality
-from summarizer.modules.modules_base import SelectionCriteria
-from summarizer.processing.text import BagOfWords
-from summarizer.processing.utils import custom_cosine
+from components.video import Video
+from components.segment import Segment
+from processing.text import BagOfWords
+from processing.utils import custom_cosine
+from modules.quality import Quality
+from modules.modules_base import SelectionCriteria
+from summarizers.base_summarizer import BaseSummarizer
 
 
 class Redundancy(SelectionCriteria):
@@ -34,7 +34,7 @@ class Redundancy(SelectionCriteria):
                     ],
                     frames_path=self.__summarizer.get_frames_path(),
                 )
-            ).best_segments_for_videos(n_segments=1)
+            ).best_segments_for_videos(n_segments=1, flatten=True)
         )
 
         return self.__summarizer

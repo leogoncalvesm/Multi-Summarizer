@@ -3,8 +3,8 @@ from os.path import join, exists
 from dataclasses import dataclass
 from os import system, listdir, makedirs
 
-from summarizer.components.video import Video, Segment
-from summarizer.processing.utils import get_seconds_from_time
+from components.video import Video, Segment
+from processing.utils import get_seconds_from_time
 
 
 @dataclass
