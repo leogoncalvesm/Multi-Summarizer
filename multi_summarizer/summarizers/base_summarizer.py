@@ -30,7 +30,7 @@ class BaseSummarizer:
     def get_videos(self) -> list[Video]:
         return self.__videos
 
-    def get_video_at(self, index: int) -> None:
+    def get_video_at(self, index: int) -> Video:
         return self.__videos[index]
 
     def start_summary_video(self) -> BaseSummarizer:

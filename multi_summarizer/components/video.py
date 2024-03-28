@@ -56,8 +56,15 @@ class Video:
     def get_content(self, separator: str = " ") -> str:
         return separator.join(seg.get_content() for seg in self.__segments)
 
-    def delete_segment(self, segment_index: int) -> None:
+    def delete_segment_at(self, segment_index: int) -> None:
         del self.__segments[segment_index]
+
+    def get_segments_in_window(self, end_sec: int, start_sec: int = 0) -> list[Segment]:
+        return [
+            segment
+            for segment in self.get_segments()
+            if segment.get_begin() < start_sec or segment.get_begin() > end_sec
+        ]
 
     def load_frames(self, frames_path: str, sort=False) -> list[Frame]:
         frames = [

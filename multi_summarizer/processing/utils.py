@@ -1,5 +1,6 @@
 import time
 import argparse
+from typing import Iterable
 from os import listdir, mkdir
 from datetime import datetime, timedelta
 from os.path import join, exists, normpath, basename, dirname
@@ -15,12 +16,8 @@ def log(message: str, log_type: str = "INFO", log_file: str = "logs.txt") -> Non
     #     f.write(f"{log_message}\n")
 
 
-def custom_cosine(v1, v2):
-    cos = 0
-    for i in range(len(v1)):
-        cos = cos + v1[i] * v2[i]
-
-    return cos
+def custom_cosine(v1: Iterable, v2: Iterable):
+    return sum(v1[i] * v2[i] for i in range(len(v1)))
 
 
 def process_arguments() -> tuple[str, str, list[str]]:

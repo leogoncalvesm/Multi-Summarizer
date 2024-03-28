@@ -67,7 +67,7 @@ class Redundancy(SelectionCriteria):
         cluster_redundancies = self.__get_redundancy_clusters()
         for cluster in cluster_redundancies:
             for video_index, segment_index in cluster:
-                self.__summarizer.get_video_at(video_index).delete_segment(
+                self.__summarizer.get_video_at(video_index).delete_segment_at(
                     segment_index
                 )
 

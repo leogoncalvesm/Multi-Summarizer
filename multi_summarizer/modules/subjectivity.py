@@ -46,7 +46,7 @@ class Subjectivity(SelectionCriteria):
 
         # Deleting objective/subjective segments from last to first
         for i in sorted(segments_to_delete, reverse=True):
-            video.delete_segment(i)
+            video.delete_segment_at(i)
 
     def __is_segment_subjective(self, segment: Segment) -> bool:
         if not self.__segment_contains_faces(segment):

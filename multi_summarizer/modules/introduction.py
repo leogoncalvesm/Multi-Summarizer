@@ -19,7 +19,7 @@ class Introduction(SelectionCriteria):
     def include(self) -> BaseSummarizer:
         shortest_intro = self.__get_shortest_introduction()
         if shortest_intro:
-            self.__summarizer.append_segment_to_summary(shortest_intro)
+            self.__summarizer.append_segments_to_summary(shortest_intro)
         return self.__summarizer
 
     def exclude(self) -> BaseSummarizer:
@@ -28,56 +28,47 @@ class Introduction(SelectionCriteria):
 
     def __remove_introductions(self) -> None:
         for video in self.__summarizer.get_videos():
-            intro = self.__find_introduction(video)
-            self.__delete_introduction(video, intro)
+            intro_end_sec = self.__find_introduction_end_second(video)
+            intro_segments = video.get_segments_in_window(end_second=intro_end_sec)
+            for _ in intro_segments:
+                video.delete_segment_at(0)
 
-    def __get_shortest_introduction(self) -> Segment:
-        min_intro = None
+    def __get_shortest_introduction(self) -> list[Segment]:
+        min_intro_segments = None
         for video in self.__summarizer.get_videos():
             # Detecting introduction in video and keeping the smallest one
-            video_intro = self.__find_introduction(video)
+            intro_end_sec = self.__find_introduction_end_second(video)
+            intro_segments = video.get_segments_in_window(end_second=intro_end_sec)
 
-            min_intro = (
-                video_intro if min_intro is None else min(min_intro, video_intro)
-            )
+            if min_end_sec is None or intro_end_sec < min_end_sec:
+                min_end_sec = intro_end_sec
+                min_intro_segments = intro_segments
 
             # Delete intro segments from vieo
-            self.__delete_introduction(video, video_intro)
+            for _ in intro_segments:
+                video.delete_segment_at(0)
 
-        return min_intro
+        return min_intro_segments
 
-    def __find_introduction(self, video: Video, threshold: float = 0.7) -> Segment:
+    def __find_introduction_end_second(
+        self, video: Video, threshold: float = 0.7
+    ) -> int:
         """
-        Creates a segment with the frames found as composing the introduction.
+        Finds and returns the end second of the video's introduction.
         Introduction's end is detected by calculating the histogram intersection betweeen consecutive frames.
         """
         # Flattened list of frames in video
         all_frames = video.load_frames(self.__summarizer.get_frames_path(), sort=True)
 
-        # Creating an empty segment
-        intro_segment = Segment(0, 0)
-        intro_segment.set_video(video)
-
         # Getting current frame and the frame on it's right
         for curr_frame, next_frame in zip(all_frames, all_frames[1:]):
-            intro_segment.set_end(intro_segment.get_end() + 1)
-
             # Calculating histogram intersection between frames
             hist_intersec = ImageProcessing.compare_histogram_intersection(
                 curr_frame, next_frame
             )
 
-            # If matches threshold rule, returns Segment
+            # If matches threshold rule, returns the frame second
             if hist_intersec < threshold:
-                return intro_segment
+                return curr_frame.get_video_second()
 
-        return intro_segment
-
-    def __delete_introduction(self, video: Video, intro_segment: Segment) -> None:
-        """
-        Gets final frame from detected introduction and removes all segments
-        where introduction's final second is bigger than or equal to the
-        segment's final second
-        """
-        while intro_segment.get_end() >= video.get_segments()[0].get_end():
-            video.delete_segment(0)
+        return curr_frame.get_video_second()
