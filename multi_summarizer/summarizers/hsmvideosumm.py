@@ -13,13 +13,13 @@ class HSMVideoSumm(BaseSummarizer):
         super().__init__(**kwargs)
 
     def summarize(self) -> Video:
+        self.start_summary_video()
         return (
-            self.start_summary_video()
+            self
             .__introduction(include=True)
             .__subjectivity(include=False)
             .__redundancy(include=True)
-            .get_summary_video()
-        )
+        ).get_summary_video()
 
     def __introduction(self, include: bool = True) -> HSMVideoSumm:
         if include:

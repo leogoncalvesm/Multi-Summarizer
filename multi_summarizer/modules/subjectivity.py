@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from processing.utils import log
 from components.video import Video
 from components.segment import Segment
 from processing.image import FaceDetector
@@ -24,10 +25,12 @@ class Subjectivity(SelectionCriteria):
         self.__face_classifier = FaceDetector(FACE_CLASSIFIER)
 
     def include(self) -> BaseSummarizer:
+        log("Filtering only subjective segments for summarized video")
         self.__clear_videos_segments(False)
         return self.__summarizer
 
     def exclude(self) -> BaseSummarizer:
+        log("Filtering out subjective segments for summarized video")
         self.__clear_videos_segments(True)
         return self.__summarizer
 

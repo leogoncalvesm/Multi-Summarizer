@@ -59,12 +59,15 @@ class Video:
     def delete_segment_at(self, segment_index: int) -> None:
         del self.__segments[segment_index]
 
-    def get_segments_in_window(self, end_sec: int, start_sec: int = 0) -> list[Segment]:
-        return [
-            segment
-            for segment in self.get_segments()
-            if segment.get_begin() < start_sec or segment.get_begin() > end_sec
-        ]
+    def get_segments_until(self, end_second: int, threshold: int = 1) -> list[Segment]:
+        segments = []
+
+        for segment in self.get_segments():
+            if segment.get_end() > (end_second + threshold):
+                break
+            segments.append(segment)
+
+        return segments
 
     def load_frames(self, frames_path: str, sort=False) -> list[Frame]:
         frames = [

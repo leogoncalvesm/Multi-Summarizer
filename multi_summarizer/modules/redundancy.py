@@ -4,6 +4,7 @@ from pandas import DataFrame
 from numpy import equal, tril
 from itertools import chain
 
+from processing.utils import log
 from components.video import Video
 from components.segment import Segment
 from processing.text import BagOfWords
@@ -19,6 +20,7 @@ class Redundancy(SelectionCriteria):
         self.__summarizer = summarizer
 
     def include(self) -> BaseSummarizer:
+        log("Including redundant segments in summarized video")
         cluster_redundancies = self.__get_redundancy_clusters()
 
         # Mapping each clustered segment for the videos to summarize as {segment: (video index, segment index)}
@@ -64,6 +66,7 @@ class Redundancy(SelectionCriteria):
         return self.__summarizer
 
     def exclude(self) -> BaseSummarizer:
+        log("Excluding redundant segments for summarized video")
         cluster_redundancies = self.__get_redundancy_clusters()
         for cluster in cluster_redundancies:
             for video_index, segment_index in cluster:

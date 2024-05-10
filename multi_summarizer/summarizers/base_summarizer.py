@@ -33,9 +33,8 @@ class BaseSummarizer:
     def get_video_at(self, index: int) -> Video:
         return self.__videos[index]
 
-    def start_summary_video(self) -> BaseSummarizer:
+    def start_summary_video(self) -> None:
         self.__summary_video = Video(name=self.__summary_name, path=self.__output_path)
-        return self
 
     def append_segment_to_summary(self, segment: Segment) -> None:
         self.__summary_video.append_segment(segment)

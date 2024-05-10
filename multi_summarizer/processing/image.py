@@ -63,17 +63,14 @@ class BagOfVisualWords:
 
 class ImageProcessing:
     @staticmethod
-    def compare_histogram_intersection(frame_1: Frame, frame_2: Frame) -> float:
-        """Calculates histograms for the two frames passed and returns the histogram intersection between the frames"""
-        # Calculating and normalizing histogram for frame 1
-        histogram_1 = calcHist([frame_1.load_image()], [0], None, [256], [0, 256])
-        normalize(histogram_1, histogram_1, norm_type=NORM_L1)
+    def get_frame_histogram(frame: Frame) -> list[float]:
+        histogram = calcHist([frame.load_image()], [0], None, [256], [0, 256])
+        normalize(histogram, histogram, norm_type=NORM_L1)
+        return histogram
 
-        # Calculating and normalizing histogram for frame 2
-        histogram_2 = calcHist([frame_2.load_image()], [0], None, [256], [0, 256])
-        normalize(histogram_2, histogram_2, norm_type=NORM_L1)
-
-        return compareHist(histogram_1, histogram_2, HISTCMP_INTERSECT)
+    @staticmethod
+    def compare_histograms(hist_1: list[float], hist_2: list[float]) -> float:
+        return compareHist(hist_1, hist_2, HISTCMP_INTERSECT)
 
     @staticmethod
     def ks_sift(segment: Segment, frames_path: str):
